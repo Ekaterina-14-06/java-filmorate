@@ -8,7 +8,7 @@ import lombok.NonNull;
 @Data
 public class Film {
     @NonNull
-    private final int id;           // id - целочисленный идентификатор фильма
+    private int id;           // id - целочисленный идентификатор фильма
     @NonNull
     private String name;            // name - название фильма (не может быть пустым)
     private String description;     // description - описание фильма (максимальная длина - 200 символов)

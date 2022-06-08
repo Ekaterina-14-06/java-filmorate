@@ -10,7 +10,7 @@ import javax.validation.constraints.NotBlank;
 @Data
 public class User {
     @NonNull
-    private final int id;        // id - целочисленный идентификатор
+    private int id;        // id - целочисленный идентификатор
     @NonNull
     @Email
     private String email;        // email - электронная почта (не может быть пустой, должна содержать символ @)

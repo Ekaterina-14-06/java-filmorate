@@ -24,6 +24,8 @@ public class FilmController {
     // создаём ЛОГЕР - Не понадобилось, поскольку используем аннотацию @Slf4j
     // private static final Logger log = LoggerFactory.getLogger(FilmController.class);
 
+    private int count = -1;
+
     // ЭНДПОИНТ: получение списка всех фильмов
     @GetMapping("/films")
     public Set<Film> getAllFilms() {
@@ -36,6 +38,9 @@ public class FilmController {
     @PostMapping(value = "/films")
     public Film createFilm(@Valid @RequestBody Film film) {
         try {
+            /*
+            // Убрала эту часть кода, поскольку увидела, что в запросе POST в тестовых примерах в теле (body)
+            // не передаётся id нового (создаваемого) фильма
             for (Film filmInFilms : films) {
                 if (filmInFilms.getId() == film.getId()) {
                     log.error("Ошибка при добавлении фильма с уже имеющимся id: {}",
@@ -44,6 +49,7 @@ public class FilmController {
                                                   "Запись о фильме не была добавлена.");
                 }
             }
+            */
 
             if (film.getDescription().length() > 200) {
                 log.error("Попытка добавления фильм, длина описания которого превышает 200 символов: {}",
@@ -53,7 +59,7 @@ public class FilmController {
             }
 
             if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
-                log.error("Попытка добавления фильма, дата релиза которого раньше 28.12.1895 г.: {}",
+                log.error("Попытка добавления фильма, дата релиза которого ранше 28.12.1895 г.: {}",
                           film.getReleaseDate());
                 throw new ValidationException("Дата релиза фильма не может быть раньше 28.12.1895 г. " +
                                               "Запись о фильме не была добавлена.");
@@ -66,6 +72,7 @@ public class FilmController {
                                               "Запись о фильме не была добавлена.");
             }
 
+            film.setId(++count);
             films.add(film);
             log.info("Добавлен фильм {}", film.toString());
         } catch (ValidationException e) {
