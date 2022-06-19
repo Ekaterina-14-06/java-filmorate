@@ -1,4 +1,4 @@
-package ru.yandex.practicum.model.exceptions;
+package ru.yandex.practicum.exceptions;
 
 public class ValidationException extends Exception {
     public ValidationException(final String message) {
