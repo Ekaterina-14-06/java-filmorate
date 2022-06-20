@@ -2,6 +2,7 @@
 package ru.yandex.practicum.storage.user;
 
 import ru.yandex.practicum.exceptions.ValidationException;
+import ru.yandex.practicum.model.Film;
 import ru.yandex.practicum.model.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -101,7 +102,7 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     // Получение пользователя по его id
-    public User getUserById(Long userId) {
+    public User getUserById(Long userId) throws ValidationException {
         try {
             for (User user : users) {
                 if (user.getId() == userId) {
@@ -115,5 +116,42 @@ public class InMemoryUserStorage implements UserStorage {
             System.out.println(e.getMessage());
         }
         return null;
+    }
+
+    @Override
+    public void deleteUser(User user) {
+        try {
+            if (!users.contains(user)) {
+                log.error("Попытка удаления несуществующего пользователя: {}", user);
+                throw new ValidationException("Попытка удаления несуществующего фильма.");
+            }
+
+            users.remove(user);
+            log.info("Удалён фильм {}", user);
+        } catch (ValidationException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    @Override
+    public void deleteUserById(Long userId) {
+        User user = null;
+        try {
+            user = getUserById(userId);
+        } catch (ValidationException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            if (!users.contains(user)) {
+                log.error("Попытка удаления несуществующего фильма: {}", user);
+                throw new ValidationException("Попытка удаления несуществующего фильма.");
+            }
+
+            users.remove(user);
+            log.info("Удалён фильм {}", user);
+        } catch (ValidationException e) {
+            System.out.println(e.getMessage());
+        }
     }
 }

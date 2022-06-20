@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
+
+import ru.yandex.practicum.exceptions.ValidationException;
 import ru.yandex.practicum.model.User;
 import ru.yandex.practicum.service.FilmService;
 import ru.yandex.practicum.service.UserService;
@@ -55,7 +57,12 @@ public class UserController {
     // GET /users/{id}
     @GetMapping(value = "/users/{id}")
     public User getUserById(@PathVariable Long id) {
-        return inMemoryUserStorage.getUserById(id);
+        try {
+            return inMemoryUserStorage.getUserById(id);
+        } catch (ValidationException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     // ЭНДПОИНТ: возвращение списка пользователей, являющихся друзьями пользователя с заданным идентификатором

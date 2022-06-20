@@ -3,12 +3,14 @@ package ru.yandex.practicum.service;  // Пакет service объединяет
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 import ru.yandex.practicum.exceptions.ValidationException;
 import ru.yandex.practicum.model.Film;
 import ru.yandex.practicum.model.User;
 import ru.yandex.practicum.storage.film.FilmStorage;
 import ru.yandex.practicum.storage.user.UserStorage;
 import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @Service  // Аннотация @Service - для получения доступа к этому классу FilmService из контроллера FilmController.
@@ -66,7 +68,7 @@ public class FilmService {
 
     // Метод getTopFilms возвращает sizeOfList (или 10, если не указано значение поля sizeOfList)
     // наиболее популярных фильмов по количеству лайков.
-    public ArrayList<Film> getTopFilms(@Autowired(required = false) Integer sizeOfList) {
+    public List<Film> getTopFilms(@RequestParam(required = false) Integer sizeOfList) {
         if (sizeOfList == null) {
             sizeOfList = 10;
         }

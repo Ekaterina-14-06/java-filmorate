@@ -5,11 +5,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
+
+import org.w3c.dom.stylesheets.LinkStyle;
 import ru.yandex.practicum.model.Film;
 import ru.yandex.practicum.service.FilmService;
 import ru.yandex.practicum.service.UserService;
 import ru.yandex.practicum.storage.film.InMemoryFilmStorage;
 import ru.yandex.practicum.storage.user.InMemoryUserStorage;
+
+import java.util.List;
 import java.util.Set;
 import java.util.ArrayList;
 
@@ -63,7 +67,7 @@ public class FilmController {
     // (если значение параметра count не задано, то вернуть первые 10 фильмов) (согласно ТЗ спринта 9)
     // GET /films/popular?count={count}
     @GetMapping(value = "/films/popular?count={count}")
-    public ArrayList<Film> getTopFilms(@PathVariable int count) {
+    public List<Film> getTopFilms(@PathVariable int count) {
         return filmService.getTopFilms(count);
     }
 
