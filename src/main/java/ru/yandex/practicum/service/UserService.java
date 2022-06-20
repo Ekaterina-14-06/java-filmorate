@@ -83,10 +83,19 @@ public class UserService {
     // Метод getFriendsOfUserById возвращает список пользователей,
     // являющихся друзьями пользователя с заданным идентификатором
     public Set<User> getFriendsOfUserById(Long userId) {
-        User user = inMemoryUserStorage.getUserById(userId);
+        User user = null;
+        try {
+            user = inMemoryUserStorage.getUserById(userId);
+        } catch (ValidationException e) {
+            e.printStackTrace();
+        }
         Set<User> friendsOfUser = new HashSet<>();
         for (Long id : user.getFriends()) {
-            friendsOfUser.add(inMemoryUserStorage.getUserById(id));
+            try {
+                friendsOfUser.add(inMemoryUserStorage.getUserById(id));
+            } catch (ValidationException e) {
+                e.printStackTrace();
+            }
         }
         return friendsOfUser;
     }
@@ -94,13 +103,27 @@ public class UserService {
     // Метод getCommonFriends возвращает список друзей, общих с другим пользователем
     // GET /users/{id}/friends/common/{otherId}
     public Set<User> getCommonFriends(Long userIdFirst, Long userIdSecond) {
-        User userFirst = inMemoryUserStorage.getUserById(userIdFirst);
-        User userSecond = inMemoryUserStorage.getUserById(userIdSecond);
+        User userFirst = null;
+        try {
+            userFirst = inMemoryUserStorage.getUserById(userIdFirst);
+        } catch (ValidationException e) {
+            e.printStackTrace();
+        }
+        User userSecond = null;
+        try {
+            userSecond = inMemoryUserStorage.getUserById(userIdSecond);
+        } catch (ValidationException e) {
+            e.printStackTrace();
+        }
         Set<User> friendsOfUser = new HashSet<>();
         for (Long id1 : userFirst.getFriends()) {
             for (Long id2 : userSecond.getFriends()) {
                 if (id1 == id2) {
-                    friendsOfUser.add(inMemoryUserStorage.getUserById(id1));
+                    try {
+                        friendsOfUser.add(inMemoryUserStorage.getUserById(id1));
+                    } catch (ValidationException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
