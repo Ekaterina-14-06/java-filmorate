@@ -5,28 +5,45 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.exceptions.ValidationException;
 import ru.yandex.practicum.model.User;
-import ru.yandex.practicum.storage.user.UserStorage;
+import ru.yandex.practicum.storage.user.InMemoryUserStorage;
+
 import java.util.HashSet;
 import java.util.Set;
 
 @Slf4j
-@Service  // Аннотация @Service - для получения доступа к этому классу UserService из контроллера UserController.
+@Service
 public class UserService {
-// Согласно ТЗ спринта 9 класс UserService отвечает за следующие операции с пользователями:
-// - добавление пользователя в друзья
-//   (если пользователь1 стал другом пользователя2, то и пользователь2 стал другом пользователя1;
-//    заявки в друзья одобрять не надо);
-// - удаление пользователя из друзей;
-// - вывод списка общих друзей.
+    private final InMemoryUserStorage inMemoryUserStorage;  // для организации доступа к inMemoryUserStorage из UserService
 
-    private final UserStorage inMemoryUserStorage;  // для организации доступа к inMemoryUserStorage из UserService
-
-    @Autowired  // Внедрение зависимостей.
-    public UserService(UserStorage inMemoryUserStorage) {
+    @Autowired
+    public UserService(InMemoryUserStorage inMemoryUserStorage) {
         this.inMemoryUserStorage = inMemoryUserStorage;
     }
 
-    // Метод addFriendById добавляет пользователя в друзья.
+    public void addFriend(User user1, User user2) {
+        try {
+            boolean isExistFriendWithThisId = false;
+            for (Long id : user1.getFriends()) {
+                if (id == user2.getId()) {
+                    isExistFriendWithThisId = true;
+                    break;
+                }
+            }
+
+            if (!isExistFriendWithThisId) {
+                user1.getFriends().add(user2.getId());
+                // если пользователь1 стал другом пользователя2, то и пользователь2 стал другом пользователя1
+                user2.getFriends().add(user1.getId());
+            } else {
+                log.error("Попытка повторного добавления пользователя в друзья.");
+                throw new ValidationException("Этот пользователь уже добавлен в друзья. " +
+                        "Повторное добавление не произведено.");
+            }
+        } catch (ValidationException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
     public void addFriendById(Long id1, Long id2) {
         try {
             User user1 = inMemoryUserStorage.getUserById(id1);
@@ -54,7 +71,28 @@ public class UserService {
         }
     }
 
-    // Метод deleteFriendById удаляет пользователя из друзей.
+    public void deleteFriend(User user1, User user2) {
+        try {
+            boolean isExistFriendWithThisId = false;
+            for (Long id : user1.getFriends()) {
+                if (id == user2.getId()) {
+                    user1.getFriends().remove(user2.getId());
+                    isExistFriendWithThisId = true;
+                    break;
+                }
+            }
+
+            if (!isExistFriendWithThisId) {
+                // Не произошло удаление пользователя из друзей, поскольку его нет среди них.
+                log.error("Попытка удаления из друзей пользователя, не находящегося в друзьях.");
+                throw new ValidationException("Запрашиваемого пользователя нет в друзьях. " +
+                        "Удаление его из друзей не произведено.");
+            }
+        } catch (ValidationException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
     public void deleteFriendById(Long id1, Long id2) {
         try {
             User user1 = inMemoryUserStorage.getUserById(id1);
@@ -73,60 +111,40 @@ public class UserService {
                 // Не произошло удаление пользователя из друзей, поскольку его нет среди них.
                 log.error("Попытка удаления из друзей пользователя, не находящегося в друзьях.");
                 throw new ValidationException("Запрашиваемого пользователя нет в друзьях. " +
-                                              "Удаление его из друзей не произведено.");
+                        "Удаление его из друзей не произведено.");
             }
         } catch (ValidationException e) {
             System.out.println(e.getMessage());
         }
     }
 
-    // Метод getFriendsOfUserById возвращает список пользователей,
-    // являющихся друзьями пользователя с заданным идентификатором
-    public Set<User> getFriendsOfUserById(Long userId) {
-        User user = null;
-        try {
-            user = inMemoryUserStorage.getUserById(userId);
-        } catch (ValidationException e) {
-            e.printStackTrace();
-        }
-        Set<User> friendsOfUser = new HashSet<>();
-        for (Long id : user.getFriends()) {
-            try {
-                friendsOfUser.add(inMemoryUserStorage.getUserById(id));
-            } catch (ValidationException e) {
-                e.printStackTrace();
-            }
-        }
-        return friendsOfUser;
-    }
-
-    // Метод getCommonFriends возвращает список друзей, общих с другим пользователем
-    // GET /users/{id}/friends/common/{otherId}
-    public Set<User> getCommonFriends(Long userIdFirst, Long userIdSecond) {
-        User userFirst = null;
-        try {
-            userFirst = inMemoryUserStorage.getUserById(userIdFirst);
-        } catch (ValidationException e) {
-            e.printStackTrace();
-        }
-        User userSecond = null;
-        try {
-            userSecond = inMemoryUserStorage.getUserById(userIdSecond);
-        } catch (ValidationException e) {
-            e.printStackTrace();
-        }
-        Set<User> friendsOfUser = new HashSet<>();
-        for (Long id1 : userFirst.getFriends()) {
-            for (Long id2 : userSecond.getFriends()) {
-                if (id1 == id2) {
-                    try {
-                        friendsOfUser.add(inMemoryUserStorage.getUserById(id1));
-                    } catch (ValidationException e) {
-                        e.printStackTrace();
-                    }
+    public Set<Long> returnIdOfCommonFriends(User user1, User user2) {
+        Set<Long> idOfCommonFriends = new HashSet<>();
+        for (Long idFriendOfUser1 : user1.getFriends()) {
+            for (Long idFriendOfUser2 : user2.getFriends()) {
+                if (idFriendOfUser1 == idFriendOfUser2) {
+                    idOfCommonFriends.add(idFriendOfUser1);
                 }
             }
         }
-        return friendsOfUser;
+        return idOfCommonFriends;
+    }
+
+    public Set<User> returnCommonFriends(Set<User> users, User user1, User user2) {
+        Set<User> commonFriends = new HashSet<>();
+        for (Long idFriendOfUser1 : user1.getFriends()) {
+            for (Long idFriendOfUser2 : user2.getFriends()) {
+                if (idFriendOfUser1 == idFriendOfUser2) {
+                    for (User user : users) {
+                        if (user.getId() == idFriendOfUser1) {
+                            commonFriends.add(user);
+                        }
+                        break;
+                    }
+                    break;
+                }
+            }
+        }
+        return commonFriends;
     }
 }

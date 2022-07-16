@@ -1,13 +1,14 @@
-package ru.yandex.practicum.storage.film;
+package ru.yandex.practicum.dao;
 
 import ru.yandex.practicum.model.Film;
+
 import java.util.Set;
 
-public interface FilmStorage {
+public interface FilmDao {
     Film createFilm(Film film);
     Film updateFilm(Film film);
     Film getFilmById(Long filmId);
     Set<Film> getFilms();
-    void deleteFilm(Film film);
+    void deleteFilms();
     void deleteFilmById(Long filmId);
 }

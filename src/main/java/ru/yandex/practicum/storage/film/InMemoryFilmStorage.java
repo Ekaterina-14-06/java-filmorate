@@ -1,4 +1,3 @@
-// В пакете storage хранятся только классы и интерфейсы, имеющие отношение к хранению данных.
 package ru.yandex.practicum.storage.film;
 
 import ru.yandex.practicum.exceptions.ValidationException;
@@ -7,18 +6,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
 @Slf4j
-@Component  // Аннотация @Component - для внедрения зависимостей и передачи хранилища сервисам.
-// Согласно ТЗ спринта 9 класс InMemoryFilmStorage содержит логику хранения, обновления и поиска объектов (фильмов).
+@Component
 public class InMemoryFilmStorage implements FilmStorage {
 
-    // Поле films - список фильмов.
     private final Set<Film> films = new HashSet<>();
 
-    // Поле countOfFilms - счётчик (определяет значение поля id).
     private Long countOfFilms = 0L;
 
     @Override
@@ -38,7 +35,7 @@ public class InMemoryFilmStorage implements FilmStorage {
                         "Запись о фильме не была добавлена.");
             }
 
-            if (film.getDuration().isNegative()) {
+            if (film.getDuration() < 0) {
                 log.error("Попытка добавления фильма, продолжительность которого отрицательная: {}",
                         film.getDuration());
                 throw new ValidationException("Продолжительность фильма должна быть положительной. " +
@@ -51,7 +48,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         } catch (ValidationException e) {
             System.out.println(e.getMessage());
         }
-        return film;  // Возвращение сущности - согласно ТЗ спринта 8.
+        return film;
     }
 
     @Override
@@ -76,7 +73,7 @@ public class InMemoryFilmStorage implements FilmStorage {
                                 "Запись о фильме не была добавлена.");
                     }
 
-                    if (film.getDuration().isNegative()) {
+                    if (film.getDuration() < 0) {
                         log.error("Попытка добавления фильма, продолжительность которого отрицательная: {}",
                                 film.getDuration());
                         throw new ValidationException("Продолжительность фильма должна быть положительной. " +
@@ -104,17 +101,15 @@ public class InMemoryFilmStorage implements FilmStorage {
             System.out.println(e.getMessage());
         }
 
-        return film;  // Возвращение сущности - согласно ТЗ спринта 8.
+        return film;
     }
 
     @Override
-    // Получение всех фильмов
     public Set<Film> getFilms() {
         return films;
     }
 
     @Override
-    // Получение фильма по его id
     public Film getFilmById(Long filmId) {
         try {
             for (Film film : films) {
@@ -162,6 +157,5 @@ public class InMemoryFilmStorage implements FilmStorage {
             System.out.println(e.getMessage());
         }
     }
-
 
 }
