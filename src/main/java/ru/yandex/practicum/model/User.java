@@ -2,15 +2,16 @@ package ru.yandex.practicum.model;
 
 import java.time.LocalDate;
 import java.util.Set;
+
 import lombok.Data;
 import org.springframework.validation.annotation.Validated;
+
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 
 @Validated
 @Data
 public class User {
-    //@NonNull
     private Long id;
     @NotEmpty
     private String login;
@@ -19,7 +20,7 @@ public class User {
     @Email
     private String email;
     private LocalDate birthday;
-    private Set<Long> friends;
+    private Set<Long> friendsIds;
     private Set<Friendship> friendsDb;
 
     public static class Friendship {

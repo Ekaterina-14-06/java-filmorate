@@ -5,6 +5,7 @@ import ru.yandex.practicum.exceptions.ValidationException;
 import ru.yandex.practicum.model.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
@@ -66,7 +67,7 @@ public class InMemoryUserStorage implements UserStorage {
 
                     userInUsers.setEmail(user.getEmail());
                     userInUsers.setBirthday(user.getBirthday());
-                    userInUsers.setFriends(user.getFriends());
+                    userInUsers.setFriendsIds(user.getFriendsIds());
 
                     log.info("Обновлён пользователь {}", user);
                     break;

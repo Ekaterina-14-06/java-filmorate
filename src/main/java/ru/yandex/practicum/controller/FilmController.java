@@ -1,6 +1,5 @@
 package ru.yandex.practicum.controller;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -17,19 +16,19 @@ import ru.yandex.practicum.service.UserService;
 import ru.yandex.practicum.storage.film.InMemoryFilmStorage;
 import ru.yandex.practicum.storage.user.InMemoryUserStorage;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import java.util.ArrayList;
 
 @Validated
 @RestController
 @Slf4j
-// @RequiredArgsConstructor
 public class FilmController {
 
-    private final FilmService filmService;                  // для организации доступа к FilmService из FilmController
-    private final UserService userService;                  // для организации доступа к UserService из FilmController
-    private final InMemoryFilmStorage inMemoryFilmStorage;  // для организации доступа к inMemoryFilmStorage из FilmController
-    private final InMemoryUserStorage inMemoryUserStorage;  // для организации доступа к inMemoryUserStorage из FilmController
+    private final FilmService filmService;
+    private final UserService userService;
+    private final InMemoryFilmStorage inMemoryFilmStorage;
+    private final InMemoryUserStorage inMemoryUserStorage;
     private final FilmDbService filmDbService;
 
     @Autowired
@@ -49,12 +48,12 @@ public class FilmController {
 
     @PostMapping(value = "/films")
     public Film createFilm(@Valid @RequestBody Film film) {
-        return inMemoryFilmStorage.createFilm(film);  // Возвращение сущности - согласно ТЗ спринта 8.
+        return inMemoryFilmStorage.createFilm(film);
     }
 
     @PutMapping(value = "/films")
     public Film updateFilm(@Valid @RequestBody Film film) {
-        return inMemoryFilmStorage.updateFilm(film);  // Возвращение сущности - согласно ТЗ спринта 8.
+        return inMemoryFilmStorage.updateFilm(film);
     }
 
     @GetMapping(value = "/films/{id}")
@@ -63,37 +62,49 @@ public class FilmController {
     }
 
     @GetMapping(value = "/films/popular?count={count}")
-    public ArrayList<Film> getTopFilms(@PathVariable int count) {
+    public List<Film> getTopFilms(@PathVariable int count) {
         return filmService.getTopFilms(count);
+    }
+
+    @GetMapping(value = "/films/popularDb?count={count}")
+    public Map<Long, Integer> getTopFilmsFromDb(@PathVariable int count) {
+        return filmDbService.getTopFilms(count);
     }
 
     @PutMapping(value = "/films/{id}/like/{userId}")
     public void addLikeToFilm(@PathVariable Long id, @PathVariable Long userId) {
         filmService.addLike(id, userId);
+        filmDbService.addLike(id, userId);
     }
 
     @DeleteMapping(value = "/films/{id}/like/{userId}")
     public void deleteLikeFromFilm(@PathVariable Long id, @PathVariable Long userId) {
         filmService.deleteLike(id, userId);
+        filmDbService.deleteLike(id, userId);
     }
 
-    @GetMapping (value = "/films/genres/")
-    public  Set<FilmGenre> getAllGenres () {
+    @GetMapping(value = "/films/genres/")
+    public Set<FilmGenre> getAllGenres() {
         return filmDbService.getGenres();
     }
 
-    @GetMapping (value = "/films/genres/{id}")
-    public  FilmGenre getGenre (@PathVariable Long id) {
+    @GetMapping(value = "/films/genres/{id}")
+    public FilmGenre getGenre(@PathVariable Long id) {
         return filmDbService.getGenreById(id);
     }
 
-    @GetMapping (value = "/films/mpa/")
-    public  Set<FilmRating> getAllRatings () {
+    @GetMapping(value = "/films/mpa/")
+    public Set<FilmRating> getAllRatings() {
         return filmDbService.getRatings();
     }
 
-    @GetMapping (value = "/films/mpa/{id}")
-    public  FilmRating getRating (@PathVariable Long id) {
+    @GetMapping(value = "/films/mpa/{id}")
+    public FilmRating getRating(@PathVariable Long id) {
         return filmDbService.getRatingById(id);
+    }
+
+    @GetMapping(value = "/films/{id}/like/")
+    public Set<Long> getLikesByFilmId(@PathVariable Long id) {
+        return filmDbService.getLikesByFilmId(id);
     }
 }

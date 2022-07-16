@@ -2,14 +2,15 @@ package ru.yandex.practicum.model;
 
 import java.time.LocalDate;
 import java.util.Set;
+
 import lombok.Data;
 import org.springframework.validation.annotation.Validated;
+
 import javax.validation.constraints.NotEmpty;
 
 @Validated
 @Data
 public class Film {
-    //@NonNull
     private Long id;
     @NotEmpty
     private String name;
@@ -19,8 +20,8 @@ public class Film {
     private Set<Long> likes;
     private Set<Long> genres;
     private Long ratingId;
-    private Set <Likes> likesDb;
-    private Set <Genres> genresDb;
+    private Set<Likes> likesDb;
+    private Set<Genres> genresDb;
 
     @Data
     public static class Likes {

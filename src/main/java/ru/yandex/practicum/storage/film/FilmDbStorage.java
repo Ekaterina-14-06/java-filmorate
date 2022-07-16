@@ -20,7 +20,7 @@ public class FilmDbStorage implements FilmDao {
 
     @Override
     public Film createFilm(Film film) {
-        SqlRowSet filmsRows = jdbcTemplate.queryForRowSet("INSERT INTO films (name,  description, release_date, duration, id_rating) " +
+        jdbcTemplate.queryForRowSet("INSERT INTO films (name,  description, release_date, duration, id_rating) " +
                         "VALUES (?, ?, ?, ?, ?)",
                 film.getName(), film.getDescription(),
                 film.getReleaseDate(), film.getDuration(), film.getRatingId());
@@ -31,12 +31,12 @@ public class FilmDbStorage implements FilmDao {
         film.setId(tempId);
 
         for (Film.Likes l : film.getLikesDb()) {
-            SqlRowSet likesRows = jdbcTemplate.queryForRowSet("INSERT INTO likes (id_film, id_user) VALUES (?, ?)",
+            jdbcTemplate.queryForRowSet("INSERT INTO likes (id_film, id_user) VALUES (?, ?)",
                     tempId, l.getUserId());
         }
 
         for (Film.Genres g : film.getGenresDb()) {
-            SqlRowSet genresRows = jdbcTemplate.queryForRowSet("INSERT INTO film_genres (id_film, id_genre) VALUES (?, ?)",
+            jdbcTemplate.queryForRowSet("INSERT INTO film_genres (id_film, id_genre) VALUES (?, ?)",
                     tempId, g.getGenreId());
         }
 
@@ -45,16 +45,16 @@ public class FilmDbStorage implements FilmDao {
 
     @Override
     public Film updateFilm(Film film) {
-        SqlRowSet filmsRows = jdbcTemplate.queryForRowSet("UPDATE films SET name = ?, description = ?, release_date = ?, duration = ?, id_rating " +
+        jdbcTemplate.queryForRowSet("UPDATE films SET name = ?, description = ?, release_date = ?, duration = ?, id_rating " +
                 "WHERE id = ?", film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration(), film.getRatingId(), film.getId());
 
         for (Film.Likes l : film.getLikesDb()) {
-            SqlRowSet likesRows = jdbcTemplate.queryForRowSet("UPDATE likes SET id_user = ? WHERE id_film = ?",
+            jdbcTemplate.queryForRowSet("UPDATE likes SET id_user = ? WHERE id_film = ?",
                     l.getUserId(), film.getId());
         }
 
         for (Film.Genres g : film.getGenresDb()) {
-            SqlRowSet genresRows = jdbcTemplate.queryForRowSet("UPDATE film_genres SET id_genre = ? WHERE id_film = ?",
+            jdbcTemplate.queryForRowSet("UPDATE film_genres SET id_genre = ? WHERE id_film = ?",
                     g.getGenreId(), film.getId());
         }
         return film;
@@ -98,7 +98,8 @@ public class FilmDbStorage implements FilmDao {
             film.setId(filmsRows.getLong("id"));
             film.setName(filmsRows.getString("name"));
             film.setDescription(filmsRows.getString("description"));
-            film.setReleaseDate(filmsRows.getDate("release_date").toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+            film.setReleaseDate(filmsRows.getDate("release_date").toInstant().atZone(ZoneId.systemDefault())
+                    .toLocalDate());
             film.setDuration(filmsRows.getInt("duration"));
             film.setRatingId(filmsRows.getLong("id_rating"));
 
@@ -122,15 +123,15 @@ public class FilmDbStorage implements FilmDao {
 
     @Override
     public void deleteFilms() {
-        SqlRowSet filmsRows = jdbcTemplate.queryForRowSet("DELETE * FROM films");
-        SqlRowSet genresRows = jdbcTemplate.queryForRowSet("DELETE * FROM film_genres");
-        SqlRowSet likesRows = jdbcTemplate.queryForRowSet("DELETE * FROM likes");
+        jdbcTemplate.queryForRowSet("DELETE * FROM films");
+        jdbcTemplate.queryForRowSet("DELETE * FROM film_genres");
+        jdbcTemplate.queryForRowSet("DELETE * FROM likes");
     }
 
     @Override
     public void deleteFilmById(Long filmId) {
-        SqlRowSet genresRows = jdbcTemplate.queryForRowSet("DELETE * FROM film_genres WHERE id = ?", filmId);
-        SqlRowSet likesRows = jdbcTemplate.queryForRowSet("DELETE * FROM likes WHERE id = ?", filmId);
-        SqlRowSet filmsRows = jdbcTemplate.queryForRowSet("DELETE * FROM films WHERE id = ?", filmId);
+        jdbcTemplate.queryForRowSet("DELETE * FROM film_genres WHERE id = ?", filmId);
+        jdbcTemplate.queryForRowSet("DELETE * FROM likes WHERE id = ?", filmId);
+        jdbcTemplate.queryForRowSet("DELETE * FROM films WHERE id = ?", filmId);
     }
 }

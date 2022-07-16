@@ -9,14 +9,14 @@ import ru.yandex.practicum.model.User;
 import ru.yandex.practicum.storage.film.InMemoryFilmStorage;
 import ru.yandex.practicum.storage.user.InMemoryUserStorage;
 
-import java.util.Set;
+import java.util.List;
 import java.util.ArrayList;
 
 @Slf4j
 @Service
 public class FilmService {
-    private final InMemoryFilmStorage inMemoryFilmStorage;  // для организации доступа к inMemoryFilmStorage из FilmService
-    private final InMemoryUserStorage inMemoryUserStorage;  // для организации доступа к inMemoryUserStorage из FilmService
+    private final InMemoryFilmStorage inMemoryFilmStorage;
+    private final InMemoryUserStorage inMemoryUserStorage;
 
     @Autowired
     public FilmService(InMemoryFilmStorage inMemoryFilmStorage,
@@ -59,15 +59,14 @@ public class FilmService {
         }
     }
 
-    public ArrayList<Film> getTopFilms(int sizeOfList) {
-        ArrayList<Film> sortedList = new ArrayList<>();
+    public List<Film> getTopFilms(int sizeOfList) {
+        List<Film> sortedList = new ArrayList<>();
         sortedList.addAll(inMemoryFilmStorage.getFilms());
 
         int size = sortedList.size();
         for (int j = 1; j < (size - 1); j++) {
             for (int i = 0; i < (size - j); i++) {
                 if (sortedList.get(i).getLikes().size() < sortedList.get(i + 1).getLikes().size()) {
-                    // Меняем местами элементы:
                     Film temp = sortedList.get(i);
 
                     sortedList.get(i).setId(sortedList.get(i + 1).getId());

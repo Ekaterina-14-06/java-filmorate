@@ -29,7 +29,7 @@ public class UserDbStorage implements UserDao {
         userRows.next();
         user.setId(userRows.getLong("id"));
 
-        for (Friendship f:user.getFriendsDb()) {
+        for (Friendship f : user.getFriendsDb()) {
             SqlRowSet friendsRows = jdbcTemplate.queryForRowSet("INSERT INTO friends (id_user, id_friend, id_status) " +
                             "VALUES (?, ?, ?)",
                     userRows.getLong("id"),
@@ -102,15 +102,15 @@ public class UserDbStorage implements UserDao {
 
     @Override
     public void deleteUsers() {
-        SqlRowSet usersRows = jdbcTemplate.queryForRowSet("DELETE * FROM users");
-        SqlRowSet friendsRows = jdbcTemplate.queryForRowSet("DELETE * FROM friends");
-        SqlRowSet likesRows = jdbcTemplate.queryForRowSet("DELETE * FROM likes");
+        jdbcTemplate.queryForRowSet("DELETE * FROM users");
+        jdbcTemplate.queryForRowSet("DELETE * FROM friends");
+        jdbcTemplate.queryForRowSet("DELETE * FROM likes");
     }
 
     @Override
     public void deleteUserById(Long userId) {
-        SqlRowSet genresRows = jdbcTemplate.queryForRowSet("DELETE * FROM friends WHERE id = ?", userId);
-        SqlRowSet likesRows = jdbcTemplate.queryForRowSet("DELETE * FROM likes WHERE id = ?", userId);
-        SqlRowSet filmsRows = jdbcTemplate.queryForRowSet("DELETE * FROM users WHERE id = ?", userId);
+        jdbcTemplate.queryForRowSet("DELETE * FROM friends WHERE id = ?", userId);
+        jdbcTemplate.queryForRowSet("DELETE * FROM likes WHERE id = ?", userId);
+        jdbcTemplate.queryForRowSet("DELETE * FROM users WHERE id = ?", userId);
     }
 }
